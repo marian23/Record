@@ -69,7 +69,8 @@ public class ablumDateModel extends AbstractTableModel {
        try {
             resultSet.absolute(row + 1);
             Object O = resultSet.getObject(column + 1);
-            return O.toString();
+           return O;
+                   //O.toString();
         } catch (SQLException se) {
             System.out.println(se);
             return se.toString();
