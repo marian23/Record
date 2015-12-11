@@ -12,8 +12,12 @@ public class Main {
 
     static Connection conn = null;
     static ResultSet rs = null;
+    static ResultSet comboResults;
+    static ResultSet CombosResults;
 
     static Statement statement = null;
+    static Statement queriey = null;
+    static Statement queries = null;
     public final static String Album = "Album_table";
     public final static String albumID = "albumID";
     public final static String Title = "title";
@@ -33,7 +37,7 @@ public class Main {
     public final static String amount = "amountSold";
     static LinkedList<Statement> allStatements = new LinkedList<Statement>();
     //public final static
-    private static ablumDateModel ablumDateModel;
+    public static ablumDateModel ablumDateModel;
     //Statement statement = null;
 
 
@@ -57,7 +61,10 @@ public class Main {
         //}
 
 
+
+
         AlbumGUI albumGUI = new AlbumGUI(ablumDateModel);
+
         }
 
     public static boolean loadAllRecord() {
@@ -65,9 +72,9 @@ public class Main {
             if (rs != null) {
                 rs.close();
             }
-            String alldata = "SELECT * FROM  Album"; //+ Album;
-            String adddat = "SELECT * FROM  Consignor";
-            String adddatas = "SELECT * FROM Sale";
+            String alldata = "SELECT * FROM " + Album; //+ Album;
+            String adddat = "SELECT * FROM  " + Consignor;
+            String adddatas = "SELECT * FROM " + Sale;
             rs = statement.executeQuery(alldata);
             rs = statement.executeQuery(adddat);
             rs = statement.executeQuery(adddatas);
@@ -112,62 +119,70 @@ public class Main {
             try {
 
                 conn = DriverManager.getConnection(DB_CONNECTION_URL, USER, PASSWORD);
-                statement = conn.createStatement();
+                statement = conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+                queriey = conn.createStatement();
                 allStatements.add(statement);
                 System.out.println("my project of the  record store ");
 
 
 //create table for album, consignor and sale
-                String createTable = "CREATE TABLE if NOT EXISTS " + Album + "( albumID int NOT NULL AUTO_INCREMENT PRIMARY KEY , Title varchar(50), Artist varchar(60),  category varchar(40), sellingPrice DOUBLE, isBasement Bool)";
+                String createTable = "CREATE TABLE  " + Album + "( albumID int NOT NULL AUTO_INCREMENT PRIMARY KEY , Title varchar(50), Artist varchar(60),  category varchar(40), sellingPrice DOUBLE, isBasement Bool)";
 
-                String deletTable = "DROP TABLE album";
-                String create = "CREATE TABLE if NOT EXISTS " + Consignor + " (consignorID INT NOT NULL AUTO_INCREMENT PRIMARY KEY , consignorName varchar(60), phoneNumber VARCHAR(11) NOT NULL , consignorPay DOUBLE, consignorOwn DOUBLE) ";
-                String deletetabel = "DROP TABLE consignor";
-                String createsaleTaple = "CREATE TABLE if NOT EXISTS " + Sale + " (saleID INT NOT NULL AUTO_INCREMENT PRIMARY KEY, sale_date date, amountSold Double, albumID int, FOREIGN KEY (albumID) REFERENCES Album(albumID), consignorID INT, FOREIGN KEY (consignorID) REFERENCES consignor(consignorID))";
+                String deletTable = "DROP TABLE " + Album;
+                String create = "CREATE TABLE  " + Consignor + " (consignorID INT NOT NULL AUTO_INCREMENT PRIMARY KEY , consignorName varchar(60), phoneNumber VARCHAR(11) NOT NULL , consignorPay DOUBLE, consignorOwn DOUBLE) ";
+                String deletetabel = "DROP TABLE " + Consignor;
+                String createsaleTaple = "CREATE TABLE  " + Sale + " (saleID INT NOT NULL AUTO_INCREMENT PRIMARY KEY, sale_date date, amountSold Double, albumID int, FOREIGN KEY (albumID) REFERENCES " + Album + "(albumID), consignorID INT, FOREIGN KEY (consignorID) REFERENCES " + Consignor + " (consignorID))";
                 String deletesql = "DROP TABLE " + Sale;
 //create insert data to test the tables
-                String addsql = "INSERT INTO " + Album + "(" + Title + ", " + Artist + ", " + category + "," + sellingPrice + ")" + " VALUEs ('deep do', 'jim', 'MPLS', 3.33  )";
 
-                String addtable = "INSERT INTO " + Consignor + " (" + consignorName + ", " + consignorPhoneNumber + ", " + consignorPay + ", " + consignorOwn + ")" + " Values ('john', '6126449988', 4.50, 3.49)";
-
-                String addSale = "INSERT INTO " + Sale + "(" + sale_date + ", " + amount + ")" + " VALUES ('2014-08-31', 12.33)";
 
 
                 try {
+
+
+
+
                     statement.executeUpdate(createTable);
-                    statement.executeUpdate(addsql);
                     System.out.println("CREATE TABLE Album ");
 
                     statement.executeUpdate(create);
                     System.out.println("CREAT TABLE consignor");
-                    statement.executeUpdate(addtable);
+
 
                     statement.executeUpdate(createsaleTaple);
                     System.out.println("CREATE TABLE Sale");
-                    statement.executeUpdate(addSale);
 
+                    createTestData();
 
                 } catch (SQLDataException sql) {
-                    if (sql.getSQLState().startsWith("XO")) {
+                    if (sql.getSQLState().startsWith("X0")) {
                         System.out.println("Album table appears to exist already, delete and recreate");
                         statement.executeUpdate(deletTable);
-                        statement.executeUpdate(createTable);
                         statement.executeUpdate(deletetabel);
-                        statement.executeUpdate(create);
                         statement.executeUpdate(deletesql);
+                        statement.executeUpdate(createTable);
+                        //statement.executeUpdate(deletetabel);
+                        statement.executeUpdate(create);
+                        //statement.executeUpdate(deletesql);
                         statement.executeUpdate(createsaleTaple);
                     } else {
                         throw sql;
+
+
                     }
 
 
-                    //} catch (SQLException sqle) {
-                    // statement.executeUpdate(deletTable);
-                    //statement.executeUpdate(createTable);
-                    //statement.executeUpdate(deletetabel);
-                    //statement.executeUpdate(createsql);
-                    //statement.executeUpdate(deletesql);
-                    //statement.executeUpdate(createsaleTaple);
+//                    } catch (SQLException sqle) {
+//                    statement.executeUpdate(deletTable);
+//                    statement.executeUpdate(deletetabel);
+//                    statement.executeUpdate(deletesql);
+//                    statement.executeUpdate(createsaleTaple);
+//
+//                    statement.executeUpdate(create);
+//                    statement.executeUpdate(createTable);
+
+
+
 
                 }
 
@@ -189,7 +204,7 @@ public class Main {
     }
 
     public static void addToAlbum(Album album) {
-        String add = "INSERT INTO albums (Title, Artist,  category, sellingPrice) VALUES (?, ?, ?, ?)";
+        String add = "INSERT INTO " + Album + " (Title, Artist,  category, sellingPrice) VALUES (?, ?, ?, ?)";
         try {
 
 
@@ -209,7 +224,7 @@ public class Main {
     }
 
     public static void addtoConsignor(Consignor consignor) {
-        String addconsignor = "INSERT INTO Consignor (consignorName, phoneNumber,consignorPay, consignorOwn) VALUES (?, ?, ?, ?)";
+        String addconsignor = "INSERT INTO " + Consignor + " (consignorName, phoneNumber,consignorPay, consignorOwn) VALUES (?, ?, ?, ?)";
 
         try {
             PreparedStatement prep = conn.prepareStatement(addconsignor);
@@ -231,12 +246,34 @@ public class Main {
 
     }
 
+    public static void createTestData() {
+        String addsql = "INSERT INTO " + Album + "(" + Title + ", " + Artist + ", " + category + "," + sellingPrice + ")" + " VALUEs ('deep do', 'jim', 'MPLS', 3.33  )";
+
+        String addtable = "INSERT INTO " + Consignor + " (" + consignorName + ", " + consignorPhoneNumber + ", " + consignorPay + ", " + consignorOwn + ")" + " Values ('john', '6126449988', 4.50, 3.49)";
+
+        String addSale = "INSERT INTO " + Sale + "(" + sale_date + ", " + amount + ")" + " VALUES ('2014-08-31', 12.33)";
+
+
+
+    try {
+        statement.executeUpdate(addsql);
+        statement.executeUpdate(addtable);
+        statement.executeUpdate(addSale);
+
+    }catch (SQLException se) {
+        se.printStackTrace();
+    }
+
+    }
     public static void addSale(Sale sale) {
-        String addSale = "INSERT INTO sale(sale_date, amountSold) VALUES (?, ?)";
+        String addSale = "INSERT INTO " + Sale + "(sale_date, amountSold , albumID, consignorID) VALUES (?, ?, ?,?)";
+        Date sqlDate = new Date(sale.getSale_date().getTime());
         try {
             PreparedStatement prep = conn.prepareStatement(addSale);
-            prep.setDate(1, (Date) sale.getSale_date());
+            prep.setDate(1, sqlDate);
             prep.setDouble(2, sale.getAmount());
+            prep.setInt(3, sale.getConsignorID());
+            prep.setInt(4, sale.getAlbumID());
             prep.executeUpdate();
 
         } catch (SQLException se) {
@@ -246,6 +283,45 @@ public class Main {
 
         }
 
+    }
+
+    public static HashMap getConsignor() {
+        String consignors = "SELECT consignorID , consignorName  FROM " + Consignor;
+        HashMap<Integer, String> consignorHash = new HashMap<>();
+        try {
+            comboResults = queriey.executeQuery(consignors);
+            while (comboResults.next()){
+                String name = comboResults.getString("consignorName");
+                int id = comboResults.getInt("consignorID");
+                consignorHash.put(id, name);
+            }
+
+
+        } catch (SQLException se) {
+            se.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+
+        }
+        return consignorHash;
+    }
+    public  static HashMap getAlbum() {
+        String albums = "SELEXT albumID, Title FROM " + Album;
+        HashMap<Integer, String> albumHash = new HashMap<>();
+        try {
+            CombosResults = queries.executeQuery(albums);
+            while (CombosResults.next()) {
+                String names = CombosResults.getString("Title");
+                int ID = CombosResults.getInt("albumID");
+                albumHash.put(ID, names);
+
+            }
+        } catch (SQLException se) {
+            se.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return albumHash;
     }
 
     public static void shutdown() {

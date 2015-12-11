@@ -16,22 +16,27 @@ public class Consignor {
     }
 
     public String getPhoneNumber() {
+
         return phoneNumber;
     }
 
     public Double getConsignorPay() {
+
         return consignorPay;
     }
 
     public Double getConsignorOwn() {
+
         return consignorOwn;
     }
 
     public String getConsignorName() {
+
         return consignorName;
     }
 
     public void setConsignorName(String consignorName) {
+
         this.consignorName = consignorName;
     }
 }

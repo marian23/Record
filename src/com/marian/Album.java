@@ -22,6 +22,7 @@ public class Album {
         this.Title = Title;
         this.Artist = Artist;
         this.Category = Category;
+        this.sellingPrice = sellingPrice;
 
     }
 

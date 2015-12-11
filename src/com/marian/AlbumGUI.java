@@ -10,6 +10,8 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Set;
 
 /**
  * Created by marian on 12/3/2015.
@@ -33,7 +35,9 @@ public class AlbumGUI extends JFrame implements WindowListener {
     private JButton quitButton;
     private JButton deleteButton;
     private JTable table1;
-
+    private JComboBox ConsignorcomboBox1;
+    private JTable tableConsignor;
+    private JTable tableAlbum;
 
 
     AlbumGUI(final ablumDateModel ablumDateModel) {
@@ -41,7 +45,7 @@ public class AlbumGUI extends JFrame implements WindowListener {
 
         //public AlbumGUI() {
             setContentPane(rootPanel);
-            pack();
+         pack();
             setTitle("Record Store Database application");
             setVisible(true);
             setPreferredSize(new Dimension(300, 300));
@@ -51,8 +55,12 @@ public class AlbumGUI extends JFrame implements WindowListener {
             radios.add(albumRadioButton);
             radios.add(consignorRadioButton);
             radios.add(saleRadioButton);
-        table1.setGridColor(Color.black);
-        table1.setModel(ablumDateModel);
+
+
+
+
+
+        fillCombo(Main.getConsignor());
 
             albumRadioButton.addActionListener(new ActionListener() {
                 @Override
@@ -140,17 +148,21 @@ public class AlbumGUI extends JFrame implements WindowListener {
 
                         Consignor consignor = new Consignor(name, phoneNumber, pay, own);
                         Main.addtoConsignor(consignor);
+                        fillCombo(Main.getConsignor());
 
                     }
                     if (saleRadioButton.isSelected()) {
                         DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
                         String sale_dateString = saledatetextField1.getText();
+                        String [] comboString = ConsignorcomboBox1.getSelectedItem().toString().split(" ");
+                        int consignorid = Integer.parseInt(comboString[0]);
                         try {
                             Date d = new Date();
                             d = df.parse(sale_dateString);
                             Double amount = Double.parseDouble(amountSoldtextField2.getText());
-                            Sale sale = new Sale(d, amount);
+                            Sale sale = new Sale(d, amount, 1, consignorid);
                             Main.addSale(sale);
+                            Main.loadAllRecord();
                         } catch (ParseException pe) {
                             System.out.println("Unable to parse " + sale_dateString);
                         }
@@ -162,6 +174,7 @@ public class AlbumGUI extends JFrame implements WindowListener {
             quitButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
+                    Main.shutdown();
                     System.exit(0);
 
                 }
@@ -169,15 +182,31 @@ public class AlbumGUI extends JFrame implements WindowListener {
             deleteButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    System.out.println("closing");
-                    Main.shutdown();
+                    int currentRow = table1.getSelectedRow();
 
-
+                    if (currentRow == -1) {      // -1 means no row is selected. Display error message.
+                        JOptionPane.showMessageDialog(rootPane, "Please choose a sale to delete");
+                    }
+                    boolean deleted = ablumDateModel.deleteRow(currentRow);
+                    if (deleted) {
+                        Main.loadAllRecord();
+                    } else {
+                        JOptionPane.showMessageDialog(rootPane, "Error deleting movie");
+                    }
                 }
             });
         }
 
-        @Override
+    private void fillCombo(HashMap consignor) {
+
+        Set keySet = consignor.keySet(); //Creates a set of the keys, and iterate over that
+        for ( Object consignorID : keySet) {
+//Use the key to get each value. Repeat for each key.
+            ConsignorcomboBox1.addItem(consignorID + " - " + consignor.get(consignorID));
+        }
+    }
+
+    @Override
         public void windowOpened (WindowEvent e){
 
         }
@@ -211,5 +240,9 @@ public class AlbumGUI extends JFrame implements WindowListener {
         public void windowDeactivated (WindowEvent e){
 
         }
+
+   // private void createUIComponents() {
+        // TODO: place custom component creation code here
     }
+//}
 //}

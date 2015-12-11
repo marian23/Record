@@ -8,9 +8,25 @@ import java.util.Date;
 public class Sale {
     Date sale_date;
     double amount;
-    public Sale(Date sale_date, Double amount){
+    int albumID;
+    int consignorID;
+
+    public Sale(Date sale_date, Double amount, int albumID, int consignorID){
+        this.amount = amount;
+        this.sale_date = sale_date;
+        this.albumID = albumID;
+        this.consignorID = consignorID;
 
     }
+
+    public int getAlbumID() {
+        return albumID;
+    }
+
+    public int getConsignorID() {
+        return consignorID;
+    }
+
     public double getAmount()
     {
         return amount;
