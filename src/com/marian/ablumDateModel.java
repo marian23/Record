@@ -8,6 +8,8 @@ import java.util.Date;
 /**
  * Created by marian on 12/3/2015.
  */
+
+//use movieRate model code to set model on my code
 public class ablumDateModel extends AbstractTableModel {
     int rowCount = 0;
     int columnCount = 0;
@@ -66,11 +68,11 @@ public class ablumDateModel extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int row, int column) {
-       try {
+        try {
             resultSet.absolute(row + 1);
             Object O = resultSet.getObject(column + 1);
-           return O;
-                   //O.toString();
+            return O;
+            //O.toString();
         } catch (SQLException se) {
             System.out.println(se);
             return se.toString();
@@ -102,6 +104,7 @@ public class ablumDateModel extends AbstractTableModel {
     }
 
     public boolean inserRow(String Title, String Artist, String category, int sellingPrice) {
+        //move to insert row to each row
         try {
             resultSet.moveToInsertRow();
             resultSet.updateString(Main.Title, Title);
@@ -120,13 +123,14 @@ public class ablumDateModel extends AbstractTableModel {
 
     }
 
-    public boolean inserRow(String consignorName, String PhoneNumber, int consignorPay, int consignorOwn) {
+    public boolean inserRow(String consignorName, String PhoneNumber) {
         try {
             resultSet.moveToInsertRow();
             resultSet.updateString(Main.consignorName, consignorName);
             resultSet.updateString(Main.consignorPhoneNumber, PhoneNumber);
-            resultSet.updateInt(Main.consignorPay, consignorPay);
-            resultSet.updateInt(Main.consignorOwn, consignorOwn);
+            //resultSet.updateDouble((Main.consignorPay,consignorPay);
+            //resultSet.updateDouble(Main.consignorOwn, consignorOwn);
+
             resultSet.insertRow();
             resultSet.moveToCurrentRow();
             fireTableDataChanged();
@@ -138,11 +142,12 @@ public class ablumDateModel extends AbstractTableModel {
         }
     }
 
-    public boolean inserRow(Date sale_date, Double amount) {
+    public boolean inserSale(Date sale_date, Double amount) {
         try {
             resultSet.moveToInsertRow();
             resultSet.updateDate(Main.sale_date, (java.sql.Date) sale_date);
             resultSet.updateDouble(Main.amount, amount);
+
             resultSet.insertRow();
             resultSet.moveToCurrentRow();
             fireTableDataChanged();
@@ -152,15 +157,38 @@ public class ablumDateModel extends AbstractTableModel {
             System.out.println(e);
             return false;
         }
+
     }
+
+
     @Override
-    public String getColumnName(int column){
+    public String getColumnName(int column) {
         try {
             return resultSet.getMetaData().getColumnName(column + 1);
 
-        }catch (SQLException se){
-            System.out.println("error feching column names" +se);
+        } catch (SQLException se) {
+            System.out.println("error feching column names" + se);
             return "?";
+        }
+    }
+
+
+    public boolean inserSale(double price, double consignorPay, double consignorOwn) {
+        try {
+
+            resultSet.moveToInsertRow();
+            resultSet.updateDouble(Main.saleprice, price);
+            resultSet.updateDouble("consignorPay", consignorPay);
+            resultSet.updateDouble("consignorOwn", consignorOwn);
+            resultSet.insertRow();
+            resultSet.moveToCurrentRow();
+            fireTableDataChanged();
+            return true;
+
+        } catch (SQLException e) {
+            System.out.println("error adding row");
+            System.out.println(e);
+            return false;
         }
     }
 }

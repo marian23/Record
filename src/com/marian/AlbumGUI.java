@@ -56,7 +56,8 @@ public class AlbumGUI extends JFrame implements WindowListener {
             radios.add(consignorRadioButton);
             radios.add(saleRadioButton);
 
-
+        table1.setGridColor(Color.black);
+        table1.setModel(ablumDateModel);
 
 
 

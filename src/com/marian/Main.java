@@ -18,12 +18,16 @@ public class Main {
     static Statement statement = null;
     static Statement queriey = null;
     static Statement queries = null;
+    static  Statement statementconn = null;
+    static Statement statementconsignor = null;
+
     public final static String Album = "Album_table";
     public final static String albumID = "albumID";
     public final static String Title = "title";
     public final static String Artist = "artist";
     public final static String category = "category";
     public final static String sellingPrice = "sellingPrice";
+    public final static String isBasement = "isBasement";
 
     public final static String Consignor = "Consignor_Table";
     public final static String PK_column = "consignorID";
@@ -35,9 +39,20 @@ public class Main {
     public final static String Sale = "Sale_table";
     public final static String sale_date = "sale_date";
     public final static String amount = "amountSold";
+
+    static String saleprice = "salePrice";
+
     static LinkedList<Statement> allStatements = new LinkedList<Statement>();
     //public final static
     public static ablumDateModel ablumDateModel;
+    public static ablumDateModel consignorDateModel;
+    public static ablumDateModel salesDateModel;
+    public static ablumDateModel salepriceDataModel;
+
+    public static ResultSet consignerResult = null;
+    public static Statement consState = null;
+    public static ResultSet salesResult = null;
+    public static Statement salesState = null;
     //Statement statement = null;
 
 
@@ -55,6 +70,12 @@ public class Main {
         if (!loadAllRecord()) {
             System.exit(-1);
         }
+        if (!loadAllConsignor()) {
+            System.exit(-1);
+        }
+        if (!loadAllSales()) {
+            System.exit(-1);
+        }
         System.out.println();
 
 
@@ -63,8 +84,11 @@ public class Main {
 
 
 
-        AlbumGUI albumGUI = new AlbumGUI(ablumDateModel);
-
+        //AlbumGUI albumGUI = new AlbumGUI(ablumDateModel);
+tabbedJframe tabbedJframe = new tabbedJframe();
+        //GUIOFAlbum guiofAlbum = new GUIOFAlbum(ablumDateModel);
+        //ConsignorGUI consignorGUI = new ConsignorGUI(ablumDateModel);
+        //SaleGUI saleGUI = new SaleGUI(ablumDateModel);
         }
 
     public static boolean loadAllRecord() {
@@ -72,12 +96,8 @@ public class Main {
             if (rs != null) {
                 rs.close();
             }
-            String alldata = "SELECT * FROM " + Album; //+ Album;
-            String adddat = "SELECT * FROM  " + Consignor;
-            String adddatas = "SELECT * FROM " + Sale;
+            String alldata = "SELECT * FROM " + Album;
             rs = statement.executeQuery(alldata);
-            rs = statement.executeQuery(adddat);
-            rs = statement.executeQuery(adddatas);
             if (ablumDateModel == null) {
                 ablumDateModel = new ablumDateModel(rs);
             } else {
@@ -91,6 +111,70 @@ public class Main {
             return false;
         }
 
+    }
+
+    public static boolean loadAllConsignor() {
+        try {
+            if (consignerResult != null) {
+                consignerResult.close();
+            }
+            String adddat = "SELECT * FROM  " + Consignor;
+            consignerResult = consState.executeQuery(adddat);
+            if (consignorDateModel == null) {
+                consignorDateModel = new ablumDateModel(consignerResult);
+            } else {
+                consignorDateModel.updateResultSet(consignerResult);
+            }
+            return true;
+        } catch (Exception e) {
+            System.out.println("Error loading or reloading album, consignor, sale");
+            System.out.println(e);
+            e.printStackTrace();
+            return false;
+        }
+
+    }
+
+    public static boolean loadAllSales() {
+        try {
+            if (salesResult != null) {
+                salesResult.close();
+            }
+            String adddatas = "SELECT * FROM " + Sale;
+            salesResult = salesState.executeQuery(adddatas);
+            if (salesDateModel == null) {
+                salesDateModel = new ablumDateModel(salesResult);
+            } else {
+                salesDateModel.updateResultSet(salesResult);
+            }
+            return true;
+        } catch (Exception e) {
+            System.out.println("Error loading or reloading album, consignor, sale");
+            System.out.println(e);
+            e.printStackTrace();
+            return false;
+        }
+
+    }
+    public static boolean loadAllsaleprice() {
+        try {
+            if (rs != null) {
+                rs.close();
+            }
+            String alldata = "SELECT * FROM " + saleprice;
+            rs = statement.executeQuery(alldata);
+            if (ablumDateModel == null) {
+                ablumDateModel = new ablumDateModel(rs);
+            } else {
+                ablumDateModel.updateResultSet(rs);
+            }
+            return true;
+        } catch (Exception e) {
+            System.out.println("Error loading or reloading album, consignor, sale");
+            System.out.println(e);
+            e.printStackTrace();
+            return false;
+        }
     }
 
 
@@ -120,18 +204,23 @@ public class Main {
 
                 conn = DriverManager.getConnection(DB_CONNECTION_URL, USER, PASSWORD);
                 statement = conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+                consState = conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+                salesState = conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
                 queriey = conn.createStatement();
+                queries = conn.createStatement();
                 allStatements.add(statement);
+                statementconn = conn.createStatement();
+                statementconsignor = conn.createStatement();
                 System.out.println("my project of the  record store ");
 
 
 //create table for album, consignor and sale
-                String createTable = "CREATE TABLE  " + Album + "( albumID int NOT NULL AUTO_INCREMENT PRIMARY KEY , Title varchar(50), Artist varchar(60),  category varchar(40), sellingPrice DOUBLE, isBasement Bool)";
+                String createTable = "CREATE TABLE IF NOT EXISTS " + Album + "( albumID int NOT NULL AUTO_INCREMENT PRIMARY KEY , Title varchar(50), Artist varchar(60),  category varchar(40), sellingPrice DOUBLE, isBasement Bool)";
 
                 String deletTable = "DROP TABLE " + Album;
-                String create = "CREATE TABLE  " + Consignor + " (consignorID INT NOT NULL AUTO_INCREMENT PRIMARY KEY , consignorName varchar(60), phoneNumber VARCHAR(11) NOT NULL , consignorPay DOUBLE, consignorOwn DOUBLE) ";
+                String create = "CREATE TABLE IF NOT EXISTS " + Consignor + " (consignorID INT NOT NULL AUTO_INCREMENT PRIMARY KEY , consignorName varchar(60), phoneNumber VARCHAR(11) NOT NULL , consignorPay DOUBLE, consignorOwn DOUBLE) ";
                 String deletetabel = "DROP TABLE " + Consignor;
-                String createsaleTaple = "CREATE TABLE  " + Sale + " (saleID INT NOT NULL AUTO_INCREMENT PRIMARY KEY, sale_date date, amountSold Double, albumID int, FOREIGN KEY (albumID) REFERENCES " + Album + "(albumID), consignorID INT, FOREIGN KEY (consignorID) REFERENCES " + Consignor + " (consignorID))";
+                String createsaleTaple = "CREATE TABLE IF NOT EXISTS " + Sale + " (saleID INT NOT NULL AUTO_INCREMENT PRIMARY KEY, sale_date date, amountSold Double, albumID int, FOREIGN KEY (albumID) REFERENCES " + Album + "(albumID), consignorID INT, FOREIGN KEY (consignorID) REFERENCES " + Consignor + " (consignorID))";
                 String deletesql = "DROP TABLE " + Sale;
 //create insert data to test the tables
 
@@ -152,14 +241,15 @@ public class Main {
                     statement.executeUpdate(createsaleTaple);
                     System.out.println("CREATE TABLE Sale");
 
-                    createTestData();
+                    //createTestData();
 
-                } catch (SQLDataException sql) {
+                } catch (SQLException sql) {
                     if (sql.getSQLState().startsWith("X0")) {
                         System.out.println("Album table appears to exist already, delete and recreate");
+                        statement.executeUpdate(deletesql);
                         statement.executeUpdate(deletTable);
                         statement.executeUpdate(deletetabel);
-                        statement.executeUpdate(deletesql);
+                        //statement.executeUpdate(deletesql);
                         statement.executeUpdate(createTable);
                         //statement.executeUpdate(deletetabel);
                         statement.executeUpdate(create);
@@ -247,7 +337,7 @@ public class Main {
     }
 
     public static void createTestData() {
-        String addsql = "INSERT INTO " + Album + "(" + Title + ", " + Artist + ", " + category + "," + sellingPrice + ")" + " VALUEs ('deep do', 'jim', 'MPLS', 3.33  )";
+        String addsql = "INSERT INTO " + Album + "(" + Title + ", " + Artist + ", " + category + "," + sellingPrice +  "," + isBasement + ")" + " VALUEs ('deep do', 'jim', 'MPLS', 3.33, FALSE  )";
 
         String addtable = "INSERT INTO " + Consignor + " (" + consignorName + ", " + consignorPhoneNumber + ", " + consignorPay + ", " + consignorOwn + ")" + " Values ('john', '6126449988', 4.50, 3.49)";
 
@@ -262,8 +352,8 @@ public class Main {
 
     }catch (SQLException se) {
         se.printStackTrace();
-    }
 
+    }
     }
     public static void addSale(Sale sale) {
         String addSale = "INSERT INTO " + Sale + "(sale_date, amountSold , albumID, consignorID) VALUES (?, ?, ?,?)";
@@ -305,8 +395,23 @@ public class Main {
         }
         return consignorHash;
     }
+    public void selectitem(){
+        try {
+
+            String update = "UPDATE  Album set isBasement = true WHERE  recieveDate < CURRENT_DATE -30";
+            statement.executeUpdate(update);
+            String add = "SELECT consignorName, Title FROM Consignor, Album WHERE  Consignor.albumID = Album.ID AND isBasement = TRUE ";
+            statement.execute(add);
+        }
+        catch (SQLException se) {
+        se.printStackTrace();
+    } catch (Exception e) {
+        e.printStackTrace();
+
+    }
+    }
     public  static HashMap getAlbum() {
-        String albums = "SELEXT albumID, Title FROM " + Album;
+        String albums = "SELECT albumID, Title FROM " + Album;
         HashMap<Integer, String> albumHash = new HashMap<>();
         try {
             CombosResults = queries.executeQuery(albums);
@@ -322,6 +427,22 @@ public class Main {
             e.printStackTrace();
         }
         return albumHash;
+    }
+
+    public static void searchAlbum(String column, String search){
+        String searchString = "Select * From " + Album + " Where " + column + " Like \"" + search + "%\"";
+        try {
+            rs = statement.executeQuery(searchString);
+            if (ablumDateModel == null) {
+                ablumDateModel = new ablumDateModel(rs);
+            } else {
+                ablumDateModel.updateResultSet(rs);
+            }
+        }catch (SQLException se) {
+            se.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static void shutdown() {
