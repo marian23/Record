@@ -177,7 +177,7 @@ public class ablumDateModel extends AbstractTableModel {
         try {
 
             resultSet.moveToInsertRow();
-            resultSet.updateDouble(Main.saleprice, price);
+            //resultSet.updateDouble(Main.saleprice, price);
             resultSet.updateDouble("consignorPay", consignorPay);
             resultSet.updateDouble("consignorOwn", consignorOwn);
             resultSet.insertRow();

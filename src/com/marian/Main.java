@@ -40,7 +40,7 @@ public class Main {
     public final static String sale_date = "sale_date";
     public final static String amount = "amountSold";
 
-    static String saleprice = "salePrice";
+   //static String saleprice = "salePrice";
 
     static LinkedList<Statement> allStatements = new LinkedList<Statement>();
     //public final static
@@ -161,7 +161,7 @@ tabbedJframe tabbedJframe = new tabbedJframe();
             if (rs != null) {
                 rs.close();
             }
-            String alldata = "SELECT * FROM " + saleprice;
+            String alldata = "SELECT * FROM " + amount;
             rs = statement.executeQuery(alldata);
             if (ablumDateModel == null) {
                 ablumDateModel = new ablumDateModel(rs);

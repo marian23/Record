@@ -8,7 +8,7 @@ public class Consignor {
     String phoneNumber;
     Double consignorPay;
     Double consignorOwn;
-    public Consignor(String name, String phoneNumber, Double pay, Double own) {
+    public Consignor(String name, String phoneNumber, double pay, double own) {
         this.consignorName = name;
         this.phoneNumber = phoneNumber;
         this.consignorPay = pay;

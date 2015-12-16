@@ -46,10 +46,13 @@ public class ConsignorGUI extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 String name = consignorNametextField1.getText();
                 String phoneNumber = phoneNumbertextField2.getText();
-                Double consignorpay = Double.parseDouble(consignorPaytextField2.getText());
-                Double consignorown = Double.parseDouble(consignorOwntextField3.getText());
+               // Double consignorpay = Double.parseDouble(consignorPaytextField2.getText());
+                //Double consignorown = Double.parseDouble(consignorOwntextField3.getText());
+                Double sale = Double.parseDouble(salepricetextField1.getText());
+                double pay = (sale / 100) * 40;
+                double own = (sale / 100) * 60;
 
-                Consignor consignor = new Consignor(name, phoneNumber, consignorpay, consignorown);
+                Consignor consignor = new Consignor(name, phoneNumber, pay, own); //consignorpay, consignorown);
                 Main.addtoConsignor(consignor);
 
 
@@ -70,7 +73,7 @@ public class ConsignorGUI extends JPanel {
 
                     boolean insertrow = ablumDateModel.inserSale(price, consignorPay, consignorOwn);
                     if (insertrow) {
-                        Main.loadAllSales();
+                        Main.loadAllConsignor();
                     } else {
                         JOptionPane.showMessageDialog(ConsignorGUI, "error adding information");
                     }
@@ -95,7 +98,7 @@ public class ConsignorGUI extends JPanel {
                 }
                 boolean deleted = ablumDateModel.deleteRow(currentRow);
                 if (deleted) {
-                    Main.loadAllRecord();
+                    Main.loadAllConsignor();
                 } else {
                     //JOptionPane.showMessageDialog(rootPane, "Error deleting movie");
                 }
